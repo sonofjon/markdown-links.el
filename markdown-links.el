@@ -39,13 +39,11 @@
 (require 'seq)            ; for seq-filter
 
 ;;;###autoload
-;; TODO: Make sure it is a MD buffer
-(defun markdown-links-insert-links (files &optional buffer newline)
+(defun markdown-links-insert-links (files &optional buffer)
   "Insert Markdown links for each element of FILES.
-FILES is a list of absolute file paths.  For each link, the link text is
-the filename (basename of the path).  If BUFFER is non-nil, insert into
-that buffer, otherwise into `current-buffer`.  If NEWLINE is non-nil,
-insert a newline after each link."
+FILES is a list of file paths.  For each link, the link text is the
+filename (basename of the path).  If BUFFER is non-nil, insert into that
+buffer, otherwise into `current-buffer`."
   (let ((target (or buffer (current-buffer))))
     (with-current-buffer target
       (unless (derived-mode-p 'markdown-mode)
@@ -53,9 +51,7 @@ insert a newline after each link."
       (dolist (f files)
         (let ((text (file-name-nondirectory f)))
           (markdown-insert-inline-link text f))
-        (when newline
-          (insert "\n"))))))
-;; TODO: remove the inline stuff
+        (insert "\n")))))
 
 ;;;###autoload
 (defun markdown-links-insert-from-files ()
@@ -81,7 +77,7 @@ insert a newline after each link."
     (unless proj
       (user-error "No project detected"))
     (let ((files (project-files proj)))
-      (markdown-links-insert-links files nil t))))
+      (markdown-links-insert-links files))))
 
 ;;;###autoload
 (defun markdown-links-insert-from-git ()
@@ -90,12 +86,13 @@ insert a newline after each link."
   (let ((root (vc-git-root default-directory)))
     (unless root
       (user-error "Not inside a Git repository"))
-    (let ((default-directory root)
-          (files (split-string
-                  (shell-command-to-string "git ls-files")
-                  "\n" t))
-          (paths (mapcar (lambda (f) (expand-file-name f root)) files)))
-      (markdown-links-insert-links paths nil t))))
+    (let* ((default-directory root)
+           (files (split-string
+                   (shell-command-to-string "git ls-files")
+                   "\n" t))
+           (paths (mapcar (lambda (f) (expand-file-name f root)) files)))
+      (markdown-links-insert-links paths))))
+
 
 ;;;###autoload
 (defun markdown-links-insert-from-dired ()
@@ -122,7 +119,7 @@ Then prompt for a target buffer and insert links at point."
          (target (read-buffer "Insert links into buffer: "
                               (other-buffer (current-buffer) t))))
     (with-current-buffer target
-      (markdown-links-insert-links all-files nil t))))
+      (markdown-links-insert-links all-files target))))
 
 (provide 'markdown-links)
 ;;; markdown-links.el ends here
