@@ -57,7 +57,8 @@ buffer, otherwise into `current-buffer`."
 (defun markdown-links-insert-from-files ()
   "Prompt for a file and insert a Markdown link to it at point."
   (interactive)
-  (let ((file (read-file-name "Insert link to file: ")))
+  (let* ((raw (read-file-name "Insert link to file: "))
+         (file (expand-file-name raw)))
     (markdown-links-insert-links (list file))))
 
 ;;;###autoload
