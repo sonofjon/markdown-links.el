@@ -68,8 +68,8 @@ buffer:
 
 ### In a Dired buffer
 
-Run this command from within Dired to pick marked files (or recurse into
-directories) and insert links at point in a target buffer:
+Run this command from within Dired to insert links for marked files
+(and files in marked directories) at point in a selected buffer:
 
 - `M-x markdown-links-insert-from-dired`
 
